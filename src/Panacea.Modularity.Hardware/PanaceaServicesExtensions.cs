@@ -10,11 +10,12 @@ namespace Panacea.Modularity.Hardware
     public static class PanaceaServicesExtensions
     {
         static IHardwareManager _instance;
+        static object _lock = new object();
         public static IHardwareManager GetHardwareManager(this PanaceaServices core)
         {
             if (_instance != null)
             {
-                lock (_instance)
+                lock (_lock)
                 {
                     if (_instance != null)
                     {
