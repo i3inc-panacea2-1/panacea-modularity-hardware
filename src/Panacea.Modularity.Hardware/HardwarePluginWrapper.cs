@@ -23,19 +23,42 @@ namespace Panacea.Modularity.Hardware
             if (e is IHardwarePlugin)
             {
                 var manager = (e as IHardwarePlugin).GetHardwareManager();
-                manager.HandsetStateChanged -= Manager_HandsetStateChanged;
+                Detach(manager);
                 _manager = null;
             }
+        }
+
+        void Detach(IHardwareManager manager)
+        {
+            manager.HandsetStateChanged -= Manager_HandsetStateChanged;
+            manager.LcdButtonChange -= Manager_LcdButtonChange;
+            manager.PowerButtonChange -= Manager_PowerButtonChange;
         }
 
         private void PluginLoader_PluginLoaded(object sender, IPlugin e)
         {
             if (e is IHardwarePlugin)
             {
+                if(_manager != null)
+                {
+                    Detach(_manager);
+                }
                 var manager = (e as IHardwarePlugin).GetHardwareManager();
                 manager.HandsetStateChanged += Manager_HandsetStateChanged;
+                manager.LcdButtonChange += Manager_LcdButtonChange;
+                manager.PowerButtonChange += Manager_PowerButtonChange;
                 _manager = manager;
             }
+        }
+
+        private void Manager_PowerButtonChange(object sender, HardwareStatus e)
+        {
+            PowerButtonChange?.Invoke(this, e);
+        }
+
+        private void Manager_LcdButtonChange(object sender, HardwareStatus e)
+        {
+            LcdButtonChange?.Invoke(this, e);
         }
 
         private void Manager_HandsetStateChanged(object sender, HardwareStatus e)
