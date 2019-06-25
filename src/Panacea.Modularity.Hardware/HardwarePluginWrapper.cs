@@ -16,6 +16,10 @@ namespace Panacea.Modularity.Hardware
             _core = core;
             _core.PluginLoader.PluginLoaded += PluginLoader_PluginLoaded;
             _core.PluginLoader.PluginUnloaded += PluginLoader_PluginUnloaded;
+            foreach (var p in core.PluginLoader.LoadedPlugins.Where(p => p.Value is IHardwarePlugin).Select(p => p.Value))
+            {
+                PluginLoader_PluginLoaded(core.PluginLoader, p);
+            }
         }
 
         private void PluginLoader_PluginUnloaded(object sender, IPlugin e)
@@ -39,7 +43,7 @@ namespace Panacea.Modularity.Hardware
         {
             if (e is IHardwarePlugin)
             {
-                if(_manager != null)
+                if (_manager != null)
                 {
                     Detach(_manager);
                 }
